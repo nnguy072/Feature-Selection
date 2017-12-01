@@ -1,10 +1,4 @@
-all: Feature_Selection
+all: main
 
-Feature_Selection:
-	g++ main.cpp
-	
-run:
-	./a.out
-	
-test:
-	./a.out data.txt
+main:
+	echo "data.txt" | python main.py
