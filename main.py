@@ -76,7 +76,9 @@ def populateDataSet(fileName):
 def forwardSelection(dataSet):
   current_set_of_features = [];
   best_best_accuracy = 0;
-
+  is_Decreasing = False
+  current_best_features = [];
+  
   for i in range(1,len(dataSet)):
     print "On Level " + str(i) + " of the search tree:"
     feature_to_add_on_this_level = -1
@@ -85,27 +87,30 @@ def forwardSelection(dataSet):
       if not intersect(current_set_of_features, j):
         accuracy = leave_one_out_cross_validation(dataSet, current_set_of_features, j)
         if not current_set_of_features:
-          print "\tUsing feature(s) {" + str(j) + "} accuracy is " + str(accuracy) + "%"
+          print "---Using feature(s) {" + str(j) + "} accuracy is " + str(accuracy) + "%"
         else:
-          print "\tUsing feature(s) {" + str(j) + ", " + "".join(str(current_set_of_features)) + "} accuracy is " + str(accuracy) + "%"
+          print "---Using feature(s) {" + str(j) + ", " + "".join(str(current_set_of_features)) + "} accuracy is " + str(accuracy) + "%"
 
         if(accuracy > best_accuracy_so_far):
           best_accuracy_so_far = accuracy
           feature_to_add_on_this_level = j
+          if(best_accuracy_so_far > best_best_accuracy):
+            best_best_accuracy = best_accuracy_so_far
+            current_best_features.append(j)
 
-    if(best_accuracy_so_far >= best_best_accuracy):
-      best_best_accuracy = best_best_accuracy
-    else:
-      print "\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)"
-      current_set_of_features_temp = current_set_of_features
+          else:
+            is_Decreasing = True
 
     if(feature_to_add_on_this_level != -1):
       print "On level " + str(i) + ", I added feature " + str(feature_to_add_on_this_level) + " to current set.\n"
       current_set_of_features.append(feature_to_add_on_this_level)
-    pprint(current_set_of_features)
-    
+    if(is_Decreasing):
+      print "\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)"
+      is_Decreasing = False
+      
 
-  pprint(current_set_of_features)
+  print(current_best_features)
+  
 
 
 def backwardElimination():
