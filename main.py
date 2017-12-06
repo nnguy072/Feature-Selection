@@ -163,9 +163,7 @@ def myAlgorithm():
 #program starts here
 print "Welcome to Nam Nguyen's Feature Selection Algorithm."
 fileName = raw_input("Type in the name of the file to test: ")
-smallSet = "small1.txt"
-bigSet = "big.txt"
-dataSet = populateDataSet(smallSet)
+dataSet = populateDataSet(fileName)
 all_features = [];
 for i in range(1, len(dataSet[0])):
   all_features.append(i)
