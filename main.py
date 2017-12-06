@@ -78,8 +78,9 @@ def forwardSelection(dataSet):
   best_best_accuracy = 0;
   is_Decreasing = False
   current_best_features = [];
+  feature_at_j = -1
   
-  for i in range(1,len(dataSet)):
+  for i in range(1,len(dataSet[0])):
     print "On Level " + str(i) + " of the search tree:"
     feature_to_add_on_this_level = -1
     best_accuracy_so_far = 0
@@ -94,21 +95,20 @@ def forwardSelection(dataSet):
         if(accuracy > best_accuracy_so_far):
           best_accuracy_so_far = accuracy
           feature_to_add_on_this_level = j
-          if(best_accuracy_so_far > best_best_accuracy):
-            best_best_accuracy = best_accuracy_so_far
-            current_best_features.append(j)
+          feature_at_j = j
+    
+    if(best_accuracy_so_far > best_best_accuracy):
+      best_best_accuracy = best_accuracy_so_far
+      current_best_features.append(feature_at_j)
+      print current_best_features
+    else:
+      print "\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)"
 
-          else:
-            is_Decreasing = True
 
     if(feature_to_add_on_this_level != -1):
       print "On level " + str(i) + ", I added feature " + str(feature_to_add_on_this_level) + " to current set.\n"
       current_set_of_features.append(feature_to_add_on_this_level)
-    if(is_Decreasing):
-      print "\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)"
-      is_Decreasing = False
       
-
   print(current_best_features)
   
 
@@ -124,7 +124,8 @@ print "Welcome to Nam Nguyen's Feature Selection Algorithm."
 #fileName = raw_input("Type in the name of the file to test: ")
 smallSet = "small.txt"
 bigSet = "big.txt"
-dataSet = populateDataSet(smallSet)
+testSet = "test.txt"
+dataSet = populateDataSet(testSet)
 
 print """Choose which algorithm to run:
 1) Forward Selection
