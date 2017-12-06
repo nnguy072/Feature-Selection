@@ -86,14 +86,14 @@ def populateDataSet(fileName):
   return temp1
 
 def forwardSelection(dataSet):
-  current_set_of_features = [];
+  current_set_of_features = [];   #current feature list
   best_best_accuracy = 0;
-  current_best_features = [];
+  current_best_features = [];     #highest acc set of features; display at end
   
-  for i in range(1,len(dataSet[0])):
+  for i in range(1,len(dataSet[0])):  #traverse through number of features
     print "On Level " + str(i) + " of the search tree:"
-    feature_to_add_on_this_level = -1
-    best_accuracy_so_far = 0
+    feature_to_add_on_this_level = -1 #feature w/ highest acc in level
+    best_accuracy_so_far = 0          #level accuracy
     for j in range(1,len(dataSet[i])):
       if not intersect(current_set_of_features, j):
         accuracy = leave_one_out_cross_validation(dataSet, current_set_of_features, j, 1)
@@ -110,7 +110,7 @@ def forwardSelection(dataSet):
       best_best_accuracy = best_accuracy_so_far
       current_best_features.append(feature_to_add_on_this_level)
     else:
-      print "\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)"
+      print "\n(Warning, Accuracy has decreased! Continui ng search in case of local maxima)"
 
     if(feature_to_add_on_this_level != -1):
       current_set_of_features.append(feature_to_add_on_this_level)
