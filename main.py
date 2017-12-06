@@ -116,7 +116,7 @@ def forwardSelection(dataSet):
       current_set_of_features.append(feature_to_add_on_this_level)
       print "Feature set " + "".join(str(current_set_of_features)) + " was best with an accuracy of " + str(best_accuracy_so_far) + "%\n" 
 
-  print "Best features: " + "".join(str(current_best_features))
+  print "Best feature(s): " + "".join(str(current_best_features)) + ", with an accuracy of " + str(best_best_accuracy) + "%"
   
 def backwardElimination(dataSet):
   #backwards elimination starst with a full set of features
@@ -126,7 +126,7 @@ def backwardElimination(dataSet):
   best_best_accuracy = 0;
   current_best_features = [];
   
-  for i in range(1,len(dataSet[0])):  #traverse number of features
+  for i in range(1,len(dataSet[0])-1):  #traverse number of features
     feature_to_add_on_this_level = -1
     best_accuracy_so_far = 0
     if(len(current_best_features) != 1):  #if there is only 1 feature left, we don't want to remove
@@ -140,21 +140,22 @@ def backwardElimination(dataSet):
             best_accuracy_so_far = accuracy     #replaced level acc
             feature_to_add_on_this_level = j    #store index
     
-    if(best_accuracy_so_far > best_best_accuracy):  #check if level acc is better than overall acc
-      best_best_accuracy = best_accuracy_so_far     #replace overall acc
-      current_best_features = (current_set_of_features) #store the current set bc it's the best so far
-    elif(best_accuracy_so_far < best_best_accuracy and len(current_best_features) != 1):
-      print "\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)"
-      
     if(feature_to_add_on_this_level != -1):
       index = 0
-      for i, features in enumerate(current_set_of_features):
+      for y, features in enumerate(current_set_of_features):
         if features == feature_to_add_on_this_level:
-          index = i
+          index = y
       current_set_of_features.pop(index)
       print "Feature set " + "".join(str(current_set_of_features)) + " was best with an accuracy of " + str(best_accuracy_so_far) + "%\n" 
 
-  print "Best features: " + "".join(str(current_best_features))
+    if(best_accuracy_so_far > best_best_accuracy):  #check if level acc is better than overall acc
+      best_best_accuracy = best_accuracy_so_far     #replace overall acc
+      current_best_features = [features for features in current_set_of_features]  #deep copy
+      #store the current set bc it's the best so far
+    elif(best_accuracy_so_far < best_best_accuracy and len(current_best_features) != 1):
+      print "(Warning, Accuracy has decreased! Continuing search in case of local maxima)\n"
+    
+  print "Best features: " + "".join(str(current_best_features)) + ", with an accuracy of " + str(best_best_accuracy) + "%"
 
 def myAlgorithm():
   print "I don't know what I am yet"
@@ -162,7 +163,7 @@ def myAlgorithm():
 #program starts here
 print "Welcome to Nam Nguyen's Feature Selection Algorithm."
 #fileName = raw_input("Type in the name of the file to test: ")
-smallSet = "small.txt"
+smallSet = "small1.txt"
 bigSet = "big.txt"
 dataSet = populateDataSet(smallSet)
 all_features = [];
