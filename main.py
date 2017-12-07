@@ -76,6 +76,68 @@ def leave_one_out_cross_validation(dataSet, current_set_of_features, k, algorith
 
   return cnt
 
+def hehe(dataSet, current_set_of_features, k, counter):
+  column_array = []
+
+  #convert numbers to columns
+  if current_set_of_features:
+    for i in range(len(current_set_of_features)):
+      column_temp = []
+      for j in range(len(dataSet)):
+        column_temp.append(float(dataSet[j][current_set_of_features[i]]))
+      column_array.append(column_temp)
+
+  #add feature k onto column_array
+  column_temp2 = []
+  for x in range(len(dataSet)):
+    column_temp2.append(float(dataSet[x][k]))
+  column_array.append(column_temp2)
+
+  points = []
+  #form points from the row i.g. "[x,y,z,...,n]"
+  #append to points; list of point
+  for i in range(len(column_array[0])):
+    points_temp = []
+    for j in range(len(column_array)):
+      points_temp.append(float(column_array[j][i]))
+    points.append(points_temp)
+
+  class_list = [] #list containing if class matches or not
+  index_i = -1;
+  index_j = -1;
+  sum_False = 0;
+  
+  #compare each points with one another
+  #find nearest neighbor for every point then check
+  #if they're the same class/if it's the correct class
+  for i in range(len(column_array[0])):
+    shortest_distance = float('inf')
+    for j in range(len(column_array[0])):
+      temp_dst = distance.euclidean(points[i],points[j])
+      if(shortest_distance > temp_dst and j != i):
+        shortest_distance = temp_dst
+        index_i = i
+        index_j = j
+
+    #if matches then true, else false1
+    if(dataSet[index_j][0] == dataSet[index_i][0]):
+      class_list.append(True)
+    else:
+      class_list.append(False)
+      sum_False += 1
+      #if wrong for more than previous instance, just stop and return 0
+      if(sum_False > counter):
+        return 0
+
+  #count num of correct instances
+  cnt = 0.0
+  for i in range(len(class_list)):
+    if(class_list[i]):
+      cnt += 1
+
+  return cnt
+
+
 #read in from file "data.txt" and store content into 2d list
 def populateDataSet(fileName):
   file = open(fileName, "r")    #open file
@@ -110,7 +172,7 @@ def forwardSelection(dataSet):
       best_best_accuracy = best_accuracy_so_far
       current_best_features.append(feature_to_add_on_this_level)
     else:
-      print "\n(Warning, Accuracy has decreased! Continui ng search in case of local maxima)"
+      print "\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)"
 
     if(feature_to_add_on_this_level != -1):
       current_set_of_features.append(feature_to_add_on_this_level)
@@ -157,8 +219,51 @@ def backwardElimination(dataSet):
 
   print "Best features: " + "".join(str(current_best_features)) + ", with an accuracy of " + str(best_best_accuracy) + "%"
 
-def myAlgorithm():
-  print "I don't know what I am yet"
+def myAlgorithm(dataSet):
+  current_set_of_features = [];   #current feature list
+  best_best_accuracy = 0;
+  current_best_features = [];     #highest acc set of features; display at end
+
+  for i in range(1,len(dataSet[0])):  #traverse through number of features
+    print "On Level " + str(i) + " of the search tree:"
+    feature_to_add_on_this_level = -1 #feature w/ highest acc in level
+    best_accuracy_so_far = 0          #level accuracy
+    num_of_wrong_on_level = float("inf")
+    num_of_wrong_overall = float("inf")
+    for j in range(1,len(dataSet[i])):
+      if not intersect(current_set_of_features, j):
+        if (num_of_wrong_on_level >= num_of_wrong_overall):
+          accuracy = hehe(dataSet, current_set_of_features, j, num_of_wrong_on_level)
+        else:
+          accuracy = hehe(dataSet, current_set_of_features, j, num_of_wrong_overall)
+        
+        if (accuracy != 0):    
+          num_of_wrong_on_level = len(dataSet) - accuracy
+        else:
+          num_of_wrong_on_level = len(dataSet)- best_accuracy_so_far
+        if (num_of_wrong_on_level < num_of_wrong_overall):
+          num_of_wrong_overall = num_of_wrong_on_level
+          
+        if not current_set_of_features:
+          print "---Using feature(s) {" + str(j) + "} accuracy is " + str(accuracy) + "%"
+        else:
+          print "---Using feature(s) {" + str(j) + ", " + "".join(str(current_set_of_features)) + "} accuracy is " + str(accuracy) + "%"
+
+        if(accuracy > best_accuracy_so_far):
+          best_accuracy_so_far = accuracy
+          feature_to_add_on_this_level = j
+
+    if(best_accuracy_so_far > best_best_accuracy):
+      best_best_accuracy = best_accuracy_so_far
+      current_best_features.append(feature_to_add_on_this_level)
+    else:
+      print "\n(Warning, Accuracy has decreased! Continuing search in case of local maxima)"
+
+    if(feature_to_add_on_this_level != -1):
+      current_set_of_features.append(feature_to_add_on_this_level)
+      print "Feature set " + "".join(str(current_set_of_features)) + " was best with an accuracy of " + str(best_accuracy_so_far) + "%\n"
+
+  print "Best feature(s): " + "".join(str(current_best_features)) + ", with an accuracy of " + str(best_best_accuracy) + "%"
 
 #program starts here
 print "Welcome to Nam Nguyen's Feature Selection Algorithm."
@@ -185,6 +290,6 @@ elif(algorithm_input == "2"):
 elif(algorithm_input == "3"):
   print "\nThis dataSet has: " + str(len(dataSet[0]) - 1) + " features (not including class attribute), with " + str(len(dataSet)) + " instances.\n"
   print "Running nearest neighbor with all " + str(len(dataSet[0]) - 1) + " features, using \"leave-one-out\" evaluation, I get an accuracy of " + str(leave_one_out_cross_validation(dataSet, all_features, -1, -1)) + "%\n"
-  myAlgorithm()
+  myAlgorithm(dataSet)
 else:
   print "Dude...just choose 1, 2, or 3 like a normal person"
